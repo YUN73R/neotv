@@ -1,0 +1,54 @@
+{
+    "expo": {
+        "name": "AiFreeTVApp",
+        "description": "a free movie of tv app",
+        "slug": "aifreetvapp",
+        "version": "1.0.0",
+        "orientation": "landscape",
+        "icon": "./assets/images/start.png",
+        "updates": {
+            "url": "https://u.expo.dev/34994044-990b-446d-9d35-8dfb80da31b4",
+            "checkAutomatically": "ON_ERROR_RECOVERY"
+        },
+        "ios": {
+            "bundleIdentifier": "com.aifreetv.app",
+            "isRemoteUpdatesEnabled": true
+        },
+        "android": {
+            "package": "com.aifreetv.app",
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/images/start.jpg",
+                "backgroundColor": "#8B5CF6"
+            },
+            "splash": {
+                "image": "./assets/images/start.jpg"
+            }
+        },
+        "splash": {
+            "image": "./assets/start.jpg",
+            "resizeMode": "contain",
+            "backgroundColor": "#8B5CF6"
+        },
+        "plugins": [
+            "expo-splash-screen",
+            "expo-status-bar",
+            "expo-video",
+            [
+                "@react-native-tvos/config-tv",
+                {
+                    "androidTVBanner": "./assets/images/start.jpg",
+                    "appleTVImages": {
+                        "icon": "./assets/images/logo.png"
+                    }
+                }
+            ]
+        ],
+        "extra": {
+            "eas": {
+                "projectId": "34994044-990b-446d-9d35-8dfb80da31b4"
+            }
+        },
+        "jsEngine": "jsc",
+        "owner": "yun73r"
+    }
+}

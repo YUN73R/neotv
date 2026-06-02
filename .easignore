@@ -1,0 +1,28 @@
+# Gradle
+gradle-8.14.3/
+.gradle/
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+
+# Node
+node_modules/
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+
+# Git
+.git/
+
+# Cache
+*.cache
+
+# Docs
+*.md
+!README.md

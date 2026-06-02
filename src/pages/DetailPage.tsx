@@ -59,7 +59,7 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
     const [currentPlayUrl, setCurrentPlayUrl] = useState('')
     const iconButtonBg = themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'
     // 全屏状态
-    const [fullScreen, setFullScreen] = useState(false)
+    const [fullscreen, setFullscreen] = useState(false)
     useEffect(() => {
         if (movie) {
             fetchDetailData(movie.id)
@@ -278,7 +278,7 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
                     <View style={styles.topSection}>
                         <View style={styles.videoContainer}>
                             {currentPlayUrl ? (
-                                <VideoPlayer key={currentPlayUrl} uri={currentPlayUrl} poster={detailData.coverUrl} />
+                                <VideoPlayer key={currentPlayUrl} uri={currentPlayUrl} poster={detailData.coverUrl} isFullScreen={fullscreen} />
                             ) :
                                 loadingSources ?
                                     <>
@@ -287,9 +287,9 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
                                             style={{ width: '100%', height: '100%' }}
                                             resizeMode="cover"
                                         />
-                                        <View style={styles.videoPlaceholder}>
+                                        <FocusableView style={styles.videoPlaceholder}>
                                             <Feather name="play" size={32} color={theme.white} />
-                                        </View>
+                                        </FocusableView>
                                     </>
                                     : (
                                         <>
@@ -342,7 +342,7 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
                                 </FocusableView>
                                 <FocusableView
                                     style={[styles.actionButton, { borderColor: theme.accent, }]}
-                                    onPress={() => setFullScreen(!fullScreen)}
+                                    onPress={() => setFullscreen(!fullscreen)}
                                 >
                                     <MaterialIcons name="fullscreen" size={16} color={theme.accent} />
                                     <Text style={[styles.actionButtonText, { color: theme.accent }]}>全屏</Text>
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
         aspectRatio: 16 / 9,
         borderRadius: 8,
         overflow: 'hidden',
-        backgroundColor: 'rgba(0,0,0,0.6)'
+        backgroundColor: 'rgba(0,0,0,0.8)'
     },
     videoImage: {
         width: '100%',
@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
         paddingTop: 0,
     },
     sectionTitleRow: {
-        marginBottom: 12,
+        marginBottom: 6,
     },
     sectionTitle: {
         fontSize: 16,
@@ -597,7 +597,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     playInfo: {
-        marginTop: 16,
         padding: 12,
         backgroundColor: 'rgba(0,0,0,0.2)',
         borderRadius: 8,

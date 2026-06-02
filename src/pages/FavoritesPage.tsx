@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Platform, View, Text, StyleSheet, ScrollView, Image } from 'react-native'
+import { Platform, View, Text, StyleSheet, ScrollView, Image, ToastAndroid } from 'react-native'
 import { MaterialIcons } from '@expo/vector-icons'
 import { useTheme } from '../context/ThemeContext'
 import { storage } from '../utils/storage'
@@ -30,6 +30,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, onNavigate }) => 
                 if (Array.isArray(items)) {
                     const validItems = items.filter(item => item && item.id && item.title)
                     setFavorites(validItems)
+                    ToastAndroid.show('长按卡片可删除', ToastAndroid.LONG)
                 } else {
                     setFavorites([])
                 }
@@ -125,7 +126,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, onNavigate }) => 
                             const title = item.title || ''
                             const timestamp = item.favoriteTime || 0
                             return (
-                                <View key={item.id} style={styles.cardWrapper}>
+                                <View key={item.id} style={[styles.cardWrapper, { flexBasis: isTV ? 100 : 140 }]}>
                                     <FocusableView
                                         style={[styles.favoriteCard, { backgroundColor: theme.card, borderColor: theme.border }]}
                                         onPress={() => handleItemPress(item)} onLongPress={() => removeItem(item.id)}
@@ -160,6 +161,9 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, onNavigate }) => 
                                 </View>
                             )
                         })}
+                        { Array.from({ length: 10 }).map((_, index) => 
+                            <View key={index} style={{ flex: 1, height: 0, flexBasis: isTV ? 100 : 140 }} />
+                        ) }
                     </View>
                 )}
             </ScrollView>
@@ -222,7 +226,7 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     favoriteCard: {
-        borderRadius: 8,
+        borderRadius: 5,
         borderWidth: 1,
         overflow: 'hidden',
         shadowColor: '#000',

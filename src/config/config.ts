@@ -13,10 +13,10 @@ export const tabs: TabConfig[] = [
     { category: 'tv', limit: 20, type: 'tv_domesti', title: '国产剧', url: 'tv' },
     { category: 'tv', limit: 20, type: 'tv_american', title: '欧美剧', url: 'tv' },
     { category: 'show', limit: 20, type: 'show', title: '综艺', url: 'tv' },
-    { category: 'tv', limit: 50, type: 'tv_japanese', title: '日剧', url: 'tv' },
-    { category: 'tv', limit: 50, type: 'tv_korean', title: '韩剧', url: 'tv' },
-    { category: 'tv', limit: 50, type: 'tv_animation', title: '动画剧', url: 'tv' },
-    { category: 'tv', limit: 50, type: 'tv_documentary', title: '纪录片', url: 'tv' },
+    { category: 'tv', limit: 20, type: 'tv_japanese', title: '日剧', url: 'tv' },
+    { category: 'tv', limit: 20, type: 'tv_korean', title: '韩剧', url: 'tv' },
+    { category: 'tv', limit: 20, type: 'tv_animation', title: '动画', url: 'tv' },
+    { category: 'tv', limit: 20, type: 'tv_documentary', title: '纪录片', url: 'tv' },
 ]
 export interface SiteConfig {
     api: string
@@ -140,4 +140,5 @@ export const API_CONFIG = {
         }
     }
 }
+export const M3U8_DATA_PATH = './src/assets/data/iptv.txt'
 export const M3U8_PATTERN = /\$https?:\/\/[^"'\s]+?\.m3u8/g

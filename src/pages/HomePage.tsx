@@ -32,6 +32,12 @@ interface ContentItem {
   card_subtitle?: string;
 }
 
+interface TabData {
+  items: ContentItem[];
+  hasMore: boolean;
+  start: number;
+}
+
 interface HomePageProps {
   onNavigate: (route: string, params?: any) => void;
 }
@@ -40,11 +46,13 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const { theme, themeMode, toggleTheme } = useTheme();
   const [searchText, setSearchText] = useState('');
   const [activeTab, setActiveTab] = useState('推荐');
-  const [content, setContent] = useState<Record<string, ContentItem[]>>({});
+  const [content, setContent] = useState<Record<string, TabData>>({});
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scrollViewRef = useRef<ScrollView>(null);
 
-  const isTV = Platform.OS === 'android' || Platform.OS === 'ios';
+  const isTV = Platform.isTV || Platform.OS === 'android' || Platform.OS === 'ios';
   const headerBg = themeMode === 'dark' ? '#2d2d2d' : '#e0e0e0';
   const iconButtonBg = themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)';
 
@@ -52,15 +60,26 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     onNavigate('Detail', { movie: item });
   };
 
-  const fetchTabContent = useCallback(async (tabTitle: string) => {
-    if (content[tabTitle]) {
+  const fetchTabContent = useCallback(async (tabTitle: string, isLoadMore = false) => {
+    const currentTabData = content[tabTitle];
+    
+    if (!isLoadMore && currentTabData) {
       return;
     }
-    setLoading(true);
+
+    const start = isLoadMore && currentTabData ? currentTabData.start + currentTabData.items.length : 0;
+    
+    if (isLoadMore) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
+
     try {
       const tab = tabs.find(t => t.title === tabTitle);
       if (!tab) return;
-      const response = await doubanApi.getTabContent(tab);
+      
+      const response = await doubanApi.getTabContent(tab, start);
       if (response.data && response.data.items) {
         const items: ContentItem[] = response.data.items.map((item: any) => {
           return {
@@ -71,13 +90,47 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             card_subtitle: item.card_subtitle || '',
           };
         });
-        setContent(prev => ({ ...prev, [tabTitle]: items }));
+        
+        const hasMore = items.length === tab.limit;
+        
+        if (isLoadMore && currentTabData) {
+          setContent(prev => ({
+            ...prev,
+            [tabTitle]: {
+              items: [...currentTabData.items, ...items],
+              hasMore,
+              start: currentTabData.start + currentTabData.items.length
+            }
+          }));
+        } else {
+          setContent(prev => ({
+            ...prev,
+            [tabTitle]: {
+              items,
+              hasMore,
+              start: 0
+            }
+          }));
+        }
       }
     } catch (error) {
       console.error('Failed to fetch tab content:', error);
-      setContent(prev => ({ ...prev, [tabTitle]: [] }));
+      if (!isLoadMore) {
+        setContent(prev => ({
+          ...prev,
+          [tabTitle]: {
+            items: [],
+            hasMore: false,
+            start: 0
+          }
+        }));
+      }
     } finally {
-      setLoading(false);
+      if (isLoadMore) {
+        setLoadingMore(false);
+      } else {
+        setLoading(false);
+      }
     }
   }, [content]);
 
@@ -101,7 +154,71 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     setActiveTab(tabTitle);
   };
 
-  const currentContent = content[activeTab] || [];
+  const handleScroll = useCallback((event: any) => {
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    const paddingToBottom = 400; // 增加触发区域，更早开始加载
+    const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
+    
+    if (isCloseToBottom && !loadingMore) {
+      const currentTabData = content[activeTab];
+      if (currentTabData && currentTabData.hasMore) {
+        fetchTabContent(activeTab, true);
+      }
+    }
+  }, [activeTab, content, loadingMore, fetchTabContent]);
+
+  const currentTabData = content[activeTab] || { items: [], hasMore: true, start: 0 };
+  const currentContent = currentTabData.items;
+
+  const renderContentItem = (item: ContentItem, index: number) => {
+    const safeTitle = typeof item.title === 'string' ? item.title : '';
+    const safeCover = item.pic?.normal || item.cover_url || '';
+    const safeRating = typeof item.rating === 'number' ? item.rating : null;
+    const safeSubtitle = item.card_subtitle?.split(' / ') || [];
+    const safeActors = safeSubtitle ? `${safeSubtitle?.[1]}-${safeSubtitle?.[3]}` : ''
+    
+    return (
+      <FocusableView 
+        key={item.id} 
+        style={[styles.contentCard, { flexBasis: isTV ? 100 : 140 }]}
+        onPress={() => onNavigate('Detail', { movie: item })}
+        hasTVPreferredFocus={index === 0}
+      >
+        <View style={styles.coverContainer}>
+          <Image 
+            source={{ uri: safeCover }} 
+            style={styles.contentCover}
+            resizeMode="cover"
+          />
+          {safeRating !== null && (
+            <View style={[styles.ratingBadge, { backgroundColor: theme.secondary }]}>
+              <MaterialIcons name="star" size={10} color="white" />
+              <Text style={styles.ratingBadgeText}>{safeRating.toFixed(1)}</Text>
+            </View>
+          )}
+        </View>
+        <View style={styles.titleContainer}>
+          <Text style={[styles.contentTitle, { color: theme.text }]} numberOfLines={1}>
+            {safeTitle}
+          </Text>
+          {safeActors.trim() !== '' && (
+            <Text style={[styles.actorsText, { color: theme.textSecondary }]} numberOfLines={1}>
+              {safeActors}
+            </Text>
+          )}
+        </View>
+      </FocusableView>
+    );
+  };
+
+  const renderContentGrid = () => {
+    return (
+      <View style={styles.contentGrid}>
+        {currentContent.map((item, index) => renderContentItem(item, index))}
+        { Array.from({ length: 10 }).map((_, index) => <View key={index} style={{ flex: 1, height: 0, flexBasis: isTV ? 100 : 140 }} />) }
+      </View>
+    );
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
@@ -163,7 +280,12 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         </View>
       </View>
       
-      <ScrollView style={[styles.content, { backgroundColor: theme.background }]}>
+      <ScrollView 
+        ref={scrollViewRef}
+        style={[styles.content, { backgroundColor: theme.background }]}
+        // onScroll={handleScroll}
+        scrollEventThrottle={100}
+      >
         <Banner onItemPress={handleBannerItemPress} />
         <TabBar activeTab={activeTab} onTabChange={handleTabChange} />
         
@@ -185,47 +307,14 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <Text style={{ color: theme.textSecondary }}>暂无内容</Text>
             </Animated.View>
           ) : (
-            <Animated.View style={[styles.contentGrid, { opacity: fadeAnim }]}>
-              {currentContent.map((item, index) => {
-                const safeTitle = typeof item.title === 'string' ? item.title : '';
-                const safeCover = item.pic?.normal || item.cover_url || '';
-                const safeRating = typeof item.rating === 'number' ? item.rating : null;
-                const safeSubtitle = item.card_subtitle?.split(' / ') || [];
-                const safeActors = safeSubtitle ? `${safeSubtitle?.[1]}-${safeSubtitle?.[3]}` : ''
-                
-                return (
-                  <FocusableView 
-                    key={item.id} 
-                    style={styles.contentCard}
-                    onPress={() => onNavigate('Detail', { movie: item })}
-                    hasTVPreferredFocus={index === 0}
-                  >
-                    <View style={styles.coverContainer}>
-                      <Image 
-                        source={{ uri: safeCover }} 
-                        style={styles.contentCover}
-                        resizeMode="cover"
-                      />
-                      {safeRating !== null && (
-                        <View style={[styles.ratingBadge, { backgroundColor: theme.secondary }]}>
-                          <MaterialIcons name="star" size={10} color="white" />
-                          <Text style={styles.ratingBadgeText}>{safeRating.toFixed(1)}</Text>
-                        </View>
-                      )}
-                    </View>
-                    <View style={styles.titleContainer}>
-                      <Text style={[styles.contentTitle, { color: theme.text }]} numberOfLines={1}>
-                        {safeTitle}
-                      </Text>
-                      {safeActors.trim() !== '' && (
-                        <Text style={[styles.actorsText, { color: theme.textSecondary }]} numberOfLines={1}>
-                          {safeActors}
-                        </Text>
-                      )}
-                    </View>
-                  </FocusableView>
-                );
-              })}
+            <Animated.View style={{ opacity: fadeAnim }}>
+              {renderContentGrid()}
+              {loadingMore && (
+                <View style={styles.loadingMoreContainer}>
+                  <ActivityIndicator size="small" color={theme.accent} />
+                  <Text style={{ color: theme.textSecondary, marginLeft: 8 }}>加载更多...</Text>
+                </View>
+              )}
             </Animated.View>
           )}
         </View>
@@ -313,6 +402,7 @@ const styles = StyleSheet.create({
   },
   section: {
     padding: 15,
+    minHeight: 400,
   },
   sectionTitle: {
     fontSize: 16,
@@ -321,6 +411,12 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     paddingVertical: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingMoreContainer: {
+    paddingVertical: 20,
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -335,8 +431,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   contentCard: {
-    width: '18%',
-    maxWidth: 140,
+    flex: 1,
     borderRadius: 5,
     overflow: 'hidden',
     backgroundColor: 'transparent',

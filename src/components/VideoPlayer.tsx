@@ -1,42 +1,52 @@
 import { useEvent } from 'expo'
 import { useVideoPlayer, VideoView, VideoPlayer as VideoPlayerType } from 'expo-video'
-import { StyleSheet, View, Text, Image, ActivityIndicator } from 'react-native'
-import { useEffect, useRef } from 'react'
+import { StyleSheet, View, Text, Image, ActivityIndicator, } from 'react-native'
+import { useEffect, useRef, useState } from 'react'
 import { useTheme, PRIMARY_COLOR_HEX, DANGER_COLOR } from '../context/ThemeContext'
 import { Feather } from '@expo/vector-icons'
 import FocusableView from '../layouts/FocusableView'
 
-export default function VideoPlayer({ uri, poster }: { uri: string, poster: string }) {
-    const playerRef = useRef<VideoPlayerType | null>(null)
+export default function VideoPlayer({ uri, poster, isFullScreen = false }: { uri: string, poster: string, isFullScreen?: boolean }) {
+    const [fullscreen, setFullscreen] = useState(false)
+    const playerRef = useRef<VideoView | null>(null)
     const player = useVideoPlayer(uri, (p) => {
-        playerRef.current = p
         p.loop = true
         p.play()
+    }, {
+        seekBackwardIncrement: 15,
+        seekForwardIncrement: 15,
     })
 
     useEffect(() => {
-        if (playerRef.current && uri) {
-            playerRef.current.play()
+        if (player && uri) {
+            player.play()
         }
     }, [uri])
+    useEffect(() => {
+        playerRef?.current?.enterFullscreen?.()
+    }, [isFullScreen])
+
+
 
     const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing })
     const { status } = useEvent(player, 'statusChange', { status: player.status })
 
     const { theme, themeMode } = useTheme()
     return (
-        <FocusableView style={styles.contentContainer}>
+        <FocusableView onPress={() => playerRef?.current?.enterFullscreen?.()} style={styles.contentContainer}>
             <VideoView
                 style={styles.video}
+                ref={playerRef}
                 player={player}
-                fullscreenOptions={{ enable: true }}
-                allowsPictureInPicture
+                fullscreenOptions={{ enable: true, orientation: 'landscape' }}
                 nativeControls={false}
+                onFullscreenEnter={() => setFullscreen(true)}
+                onFullscreenExit={() => setFullscreen(false)}
             />
             {
                 !isPlaying ? <View style={styles.tips}>
                     <Image style={styles.poster} source={{
-                        uri: poster, 
+                        uri: poster,
                         headers: {
                             Referer: 'https://movie.douban.com/',
                         }

@@ -28,9 +28,9 @@ export const doubanApi = {
   getWeeklyMovies: (count = 10) => {
     return api.get(`subject_collection/movie_weekly_best/items?start=0&count=${count}&updated_at=&items_only=1&type_tag=&for_mobile=1`);
   },
-  getTabContent: (tab: { url: string; limit: number; category: string; type: string }) => {
+  getTabContent: (tab: { url: string; limit: number; category: string; type: string }, start = 0) => {
     const { url, limit, category, type } = tab;
-    return api.get(`subject/recent_hot/${url}?limit=${limit}&category=${category}&type=${type}`);
+    return api.get(`subject/recent_hot/${url}?start=${start}&limit=${limit}&category=${category}&type=${type}`);
   },
   getMovieDetail: (id: string) => {
     return api.get(`movie/${id}?ck=&for_mobile=1`);

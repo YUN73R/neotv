@@ -9,6 +9,7 @@ import { getMovieDetail, MovieSource } from '../services/movieService'
 import { MovieItem, HistoryItem, FavoriteItem } from '../types/navigation'
 import VideoPlayer from '../components/VideoPlayer'
 import FocusableView from '../layouts/FocusableView'
+import { PLACEHOLDER_IMAGE_TV } from '../config/config'
 
 interface DetailPageProps {
     onBack: () => void
@@ -253,11 +254,10 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background }]}>
-            { isTV ? '' : <View style={styles.header}>
+            {isTV ? '' : <View style={styles.header}>
                 <FocusableView
                     style={[styles.backButton, { backgroundColor: iconButtonBg }]}
                     onPress={onBack}
-                    hasTVPreferredFocus
                 >
                     <MaterialIcons name="arrow-back" size={24} color="white" />
                 </FocusableView>
@@ -274,18 +274,28 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
                     <Text style={{ color: theme.textSecondary, marginTop: 12 }}>正在加载详情...</Text>
                 </View>
             ) : (
-                <ScrollView style={[styles.content, { backgroundColor: theme.background, marginTop: isTV ? 0 : 38 }]}>
+                <ScrollView style={[styles.content, { backgroundColor: theme.background, marginTop: isTV ? 0 : 38 }]} showsVerticalScrollIndicator={false}>
                     <View style={styles.topSection}>
                         <View style={styles.videoContainer}>
                             {currentPlayUrl ? (
-                                <VideoPlayer key={currentPlayUrl} uri={currentPlayUrl} poster={detailData.coverUrl} isFullScreen={fullscreen} />
+                                <VideoPlayer
+                                    key={currentPlayUrl}
+                                    uri={currentPlayUrl}
+                                    poster={detailData.coverUrl}
+                                    isFullScreen={fullscreen}
+                                    toggleFullscreen={() => setFullscreen(false)}
+                                />
                             ) :
                                 loadingSources ?
                                     <>
                                         <Image
-                                            source={{ uri: detailData.coverUrl }}
+                                            defaultSource={{
+                                                uri: PLACEHOLDER_IMAGE_TV,
+                                            }}
+                                            source={{ uri: detailData.coverUrl, headers: { 'Referrer': 'https://m.douban.com/', } }}
                                             style={{ width: '100%', height: '100%' }}
                                             resizeMode="cover"
+                                            crossOrigin="anonymous"
                                         />
                                         <FocusableView style={styles.videoPlaceholder}>
                                             <Feather name="play" size={32} color={theme.white} />
@@ -294,9 +304,13 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
                                     : (
                                         <>
                                             <Image
-                                                source={{ uri: detailData.coverUrl }}
+                                                defaultSource={{
+                                                    uri: PLACEHOLDER_IMAGE_TV,
+                                                }}
+                                                source={{ uri: detailData.coverUrl, headers: { 'Referrer': 'https://m.douban.com/', } }}
                                                 style={{ width: '100%', height: '100%' }}
                                                 resizeMode="cover"
+                                                crossOrigin="anonymous"
                                             />
                                             <View style={styles.videoPlaceholder}>
                                                 <Feather name="frown" size={32} color={theme.white} />
@@ -365,7 +379,6 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
                                             activeSourceIndex === index ? { backgroundColor: theme.accent } : { backgroundColor: theme.card, borderColor: theme.border },
                                         ]}
                                         onPress={() => handleSourceChange(index)}
-                                        hasTVPreferredFocus={index === 0 && activeSourceIndex === 0}
                                     >
                                         <Text style={[styles.sourceTabText, activeSourceIndex === index ? { color: 'white' } : { color: theme.text }]}>
                                             {source.title}
@@ -387,7 +400,6 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
                                             activeEpisodeIndex === index ? { backgroundColor: theme.accent } : { backgroundColor: theme.card, borderColor: theme.border },
                                         ]}
                                         onPress={() => handleEpisodeSelect(index)}
-                                        hasTVPreferredFocus={index === 0 && activeEpisodeIndex === 0}
                                     >
                                         <Text style={[styles.episodeButtonText, activeEpisodeIndex === index ? { color: 'white' } : { color: theme.text }]}>
                                             {item.name}

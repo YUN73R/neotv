@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { View, StyleSheet, Platform, Pressable, Animated } from 'react-native'
+import { View, StyleSheet, Platform, Pressable, Animated  } from 'react-native'
 import { useTheme, PRIMARY_COLOR_HEX } from '../context/ThemeContext'
 
 interface FocusableViewProps {
@@ -10,9 +10,9 @@ interface FocusableViewProps {
     onFocus?: () => void
     onBlur?: () => void
     disabled?: boolean
-    tvParallaxProperties?: any
     focusBorderColor?: string
-    hasTVPreferredFocus?: boolean
+    ferredFocus?: boolean
+    backgroundColor?: string
 }
 export const FOCUS_BORDER_WIDTH = 2
 export const FOCUS_GLOW_OFFSET = 0
@@ -23,20 +23,24 @@ const FocusableView: React.FC<FocusableViewProps> = ({
     onLongPress,
     onFocus,
     onBlur,
+    ferredFocus,
     disabled = false,
     focusBorderColor,
+    backgroundColor,
 }) => {
-    const borderAnim = useRef(new Animated.Value(0)).current
-    useEffect(() => {
-        Animated.timing(borderAnim, {
-            toValue: 1,
-            duration: 500,
-            useNativeDriver: true,
-        }).start()
-    }, [borderAnim])
+    
     const { theme } = useTheme()
     const [isFocused, setIsFocused] = useState(false)
 
+    const borderAnim = useRef(new Animated.Value(0)).current
+    useEffect(() => {
+        Animated.timing(borderAnim, {
+            toValue: isFocused ? 1 : 0,
+            duration: 200,
+            delay: 0,
+            useNativeDriver: true,
+        }).start()
+    }, [isFocused, borderAnim])
     const handleFocus = () => {
         setIsFocused(true)
         onFocus?.()
@@ -58,6 +62,7 @@ const FocusableView: React.FC<FocusableViewProps> = ({
             onFocus={handleFocus}
             onBlur={handleBlur}
             disabled={disabled}
+            hasTVPreferredFocus={ferredFocus}
             style={[
                 styles.baseStyle,
                 style,
@@ -71,6 +76,7 @@ const FocusableView: React.FC<FocusableViewProps> = ({
                         {
                             borderColor,
                             borderRadius,
+                            backgroundColor,
                             opacity: borderAnim,
                         },
                     ]}

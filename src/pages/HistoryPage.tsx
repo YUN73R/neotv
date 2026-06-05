@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Platform, View, Text, StyleSheet, ScrollView, Image, ToastAndroid } from 'react-native'
 import { MaterialIcons } from '@expo/vector-icons'
-import { useTheme } from '../context/ThemeContext'
+import { useTheme, BOX_SHADOW } from '../context/ThemeContext'
 import { storage } from '../utils/storage'
 import { HistoryItem } from '../types/navigation'
 import FocusableView from '../layouts/FocusableView'
+import { PLACEHOLDER_IMAGE } from '../config/config'
 
 interface HistoryPageProps {
     onBack: () => void
@@ -32,7 +33,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onBack, onNavigate }) => {
                     // 清理无效数据
                     const validItems = items.filter(item => item && item.id && item.title)
                     setHistory(validItems)
-                    ToastAndroid.show('长按卡片可删除', ToastAndroid.LONG)
+                    ToastAndroid?.show?.('长按卡片可删除', ToastAndroid.LONG)
                 } else {
                     setHistory([])
                 }
@@ -100,26 +101,26 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onBack, onNavigate }) => {
     return (
         <View style={[styles.container, { backgroundColor: theme.background }]}>
             <View style={[styles.header, { backgroundColor: theme.headerBg }]}>
-                {isTV ? '' : <FocusableView
+                {!isTV && (<FocusableView
                     style={[styles.backButton, { backgroundColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)' }]}
                     onPress={onBack}
-                    hasTVPreferredFocus
                 >
                     <MaterialIcons name="arrow-back" size={24} color={theme.text} />
-                </FocusableView>}
+                </FocusableView>
+                )}
                 <Text style={[styles.title, { color: theme.text }]}>历史记录</Text>
                 {history.length > 0 ? (
                     <FocusableView
                         style={styles.clearButton}
                         onPress={clearHistory}
                     >
-                        <Text style={[styles.clearButtonText, { color: theme.textSecondary }]}>清空</Text>
+                        <Text style={[styles.clearButtonText, { color: theme.text }]}>清空</Text>
                     </FocusableView>
                 ) : (
                     <View style={styles.headerRight} />
                 )}
             </View>
-            <ScrollView style={[styles.content, { backgroundColor: theme.background }]}>
+            <ScrollView style={[styles.content, { backgroundColor: theme.background }]} showsVerticalScrollIndicator={false}>
                 {history.length === 0 ? (
                     <View style={styles.emptyState}>
                         <MaterialIcons name="history" size={60} color={theme.textSecondary} />
@@ -137,15 +138,19 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onBack, onNavigate }) => {
                             return (
                                 <View key={item.id} style={[styles.cardWrapper, { flexBasis: isTV ? 100 : 140 }]}>
                                     <FocusableView
-                                        style={[styles.historyCard, { backgroundColor: theme.card, borderColor: theme.border }]}
+                                        style={[styles.historyCard, { backgroundColor: theme.card }]}
                                         onPress={() => handleItemPress(item)} onLongPress={() => removeItem(index)}
-                                        hasTVPreferredFocus={index === 0}
+                                        ferredFocus={index === 0}
                                     >
                                         <View style={styles.cardCoverWrapper}>
                                             <Image
-                                                source={{ uri: coverUrl }}
+                                                defaultSource={{
+                                                    uri: PLACEHOLDER_IMAGE,
+                                                }}
+                                                source={{ uri: coverUrl, headers: { 'Referrer': 'https://m.douban.com/', } }}
                                                 style={styles.cardCover}
                                                 resizeMode="cover"
+                                                crossOrigin="anonymous"
                                             />
                                             {!coverUrl && (
                                                 <View style={styles.coverPlaceholder}>
@@ -162,18 +167,20 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onBack, onNavigate }) => {
                                             </Text>
                                         </View>
                                     </FocusableView>
-                                    <FocusableView
-                                        style={styles.deleteButton}
-                                        onPress={() => removeItem(index)}
-                                    >
-                                        <MaterialIcons name="close" size={16} color="#fff" />
-                                    </FocusableView>
+                                    {!isTV && (
+                                        <FocusableView
+                                            style={styles.deleteButton}
+                                            onPress={() => removeItem(index)}
+                                        >
+                                            <MaterialIcons name="close" size={16} color="#fff" />
+                                        </FocusableView>
+                                    )}
                                 </View>
                             )
                         })}
-                        { Array.from({ length: 10 }).map((_, index) => 
+                        {Array.from({ length: 10 }).map((_, index) =>
                             <View key={index} style={{ flex: 1, height: 0, flexBasis: isTV ? 100 : 140 }} />
-                        ) }
+                        )}
                     </View>
                 )}
             </ScrollView>
@@ -205,6 +212,8 @@ const styles = StyleSheet.create({
     },
     clearButton: {
         paddingHorizontal: 16,
+        paddingVertical: 2,
+        borderRadius: 20,
     },
     clearButtonText: {
         fontSize: 14,
@@ -238,13 +247,9 @@ const styles = StyleSheet.create({
     },
     historyCard: {
         borderRadius: 5,
-        borderWidth: 1,
+        borderWidth: 0,
         overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 3,
+        boxShadow: BOX_SHADOW,
     },
     cardCoverWrapper: {
         width: '100%',

@@ -4,11 +4,12 @@ import { View, Text, StyleSheet, Animated } from 'react-native';
 interface ToastProps {
   visible: boolean;
   message: string;
+  offsetTop?: number | string;
   onClose: () => void;
   duration?: number;
 }
 
-const Toast: React.FC<ToastProps> = ({ visible, message, onClose, duration = 2000 }) => {
+const Toast: React.FC<ToastProps> = ({ visible, message, offsetTop = 100, onClose, duration = 2000 }) => {
   const [opacity] = useState(new Animated.Value(0));
 
   useEffect(() => {
@@ -36,7 +37,8 @@ const Toast: React.FC<ToastProps> = ({ visible, message, onClose, duration = 200
   if (!visible) return null;
 
   return (
-    <Animated.View style={[styles.container, { opacity }]}>
+    /** @ts-ignore */
+    <Animated.View style={[styles.container, { opacity, top: offsetTop }]}>
       <View style={styles.toast}>
         <Text style={styles.message}>{message}</Text>
       </View>
@@ -47,7 +49,6 @@ const Toast: React.FC<ToastProps> = ({ visible, message, onClose, duration = 200
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: 100,
     left: 0,
     right: 0,
     justifyContent: 'center',

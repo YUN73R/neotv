@@ -5,8 +5,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useTheme, PRIMARY_COLOR_HEX, DANGER_COLOR } from '../context/ThemeContext'
 import { Feather } from '@expo/vector-icons'
 import FocusableView from '../layouts/FocusableView'
+import { PLACEHOLDER_IMAGE_TV } from '../config/config'
 
-export default function VideoPlayer({ uri, poster, isFullScreen = false }: { uri: string, poster: string, isFullScreen?: boolean }) {
+export default function VideoPlayer({ uri, poster, isFullScreen = false, toggleFullscreen }: { uri: string, poster?: string, isFullScreen?: boolean, toggleFullscreen: (full: boolean) => void }) {
     const [fullscreen, setFullscreen] = useState(false)
     const playerRef = useRef<VideoView | null>(null)
     const player = useVideoPlayer(uri, (p) => {
@@ -18,52 +19,62 @@ export default function VideoPlayer({ uri, poster, isFullScreen = false }: { uri
     })
 
     useEffect(() => {
-        if (player && uri) {
-            player.play()
-        }
+        if (player && uri) player.play()
     }, [uri])
     useEffect(() => {
-        playerRef?.current?.enterFullscreen?.()
+        console.log('isFullScreen', isFullScreen)
+        if (isFullScreen) playerRef?.current?.enterFullscreen?.()
     }, [isFullScreen])
 
-
-
-    const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing })
+    const sourceLoaded = useEvent(player, 'sourceLoad')
+    
     const { status } = useEvent(player, 'statusChange', { status: player.status })
 
     const { theme, themeMode } = useTheme()
+    
     return (
-        <FocusableView onPress={() => playerRef?.current?.enterFullscreen?.()} style={styles.contentContainer}>
+        <FocusableView onPress={() => playerRef?.current?.enterFullscreen?.()} style={styles.contentContainer} ferredFocus={true}>
             <VideoView
                 style={styles.video}
                 ref={playerRef}
                 player={player}
-                fullscreenOptions={{ enable: true, orientation: 'landscape' }}
-                nativeControls={false}
-                onFullscreenEnter={() => setFullscreen(true)}
-                onFullscreenExit={() => setFullscreen(false)}
+                fullscreenOptions={{ enable: false, orientation: 'landscape' }}
+                nativeControls={fullscreen}
+                onFullscreenEnter={() => {
+                    setFullscreen(true)
+                    toggleFullscreen(true)
+                }}
+                onFullscreenExit={() => {
+                    setFullscreen(false)
+                    toggleFullscreen(false)
+                }}
             />
-            {
-                !isPlaying ? <View style={styles.tips}>
-                    <Image style={styles.poster} source={{
+            <View style={styles.loadingWrapper}>
+                {!sourceLoaded && (
+                    <Image style={styles.poster} 
+                    defaultSource={{
+                        uri: PLACEHOLDER_IMAGE_TV,
+                    }}
+                    source={{
                         uri: poster,
                         headers: {
-                            Referer: 'https://movie.douban.com/',
+                            Referer: 'https://m.douban.com/',
                         }
                     }} crossOrigin="anonymous" />
-                    {status == 'loading' ?
-                        <View style={styles.loadingContainer}>
-                            <ActivityIndicator size="large" color={theme.accent} />
-                            <Text style={{ color: 'white', fontSize: 14, marginTop: 12 }}>正在加载...</Text>
-                        </View> : ''}
-                    {status == 'error' ?
-                        <View style={styles.loadingContainer}>
-                            <Feather name="frown" size={32} color={DANGER_COLOR} />
-                            <Text style={{ color: DANGER_COLOR, fontSize: 16, }}>视频播放出错</Text>
-                        </View>
-                        : ''}
-                </View> : ''
-            }
+                )}
+                {status == 'loading' && (
+                    <View style={styles.loadingContainer}>
+                        <ActivityIndicator size="large" color={theme.accent} />
+                        <Text style={{ color: 'white', fontSize: 14, marginTop: 12 }}>正在加载...</Text>
+                    </View>
+                )}
+                {status == 'error' && (
+                    <View style={styles.loadingContainer}>
+                        <Feather name="frown" size={32} color={DANGER_COLOR} />
+                        <Text style={{ color: DANGER_COLOR, fontSize: 16, marginTop: 12 }}>视频播放出错</Text>
+                    </View>
+                )}
+            </View>
         </FocusableView>
     )
 }
@@ -82,17 +93,13 @@ const styles = StyleSheet.create({
         height: '100%',
         borderRadius: 8,
     },
-    tips: {
-        color: 'white',
-        fontSize: 14,
-        zIndex: 1000,
+    loadingWrapper: {
+        zIndex: 10,
         position: 'absolute',
         inset: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        pointerEvents: 'none',
     },
     poster: {
         width: '100%',
@@ -107,8 +114,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         position: 'absolute',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         inset: 0,
-        zIndex: 1000,
+        zIndex: 10,
     },
     content: {
         flex: 1,

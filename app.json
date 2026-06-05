@@ -1,11 +1,11 @@
 {
     "expo": {
-        "name": "AiFreeTVApp",
+        "name": "极简TV",
         "description": "a free movie of tv app",
         "slug": "aifreetvapp",
         "version": "1.0.0",
         "orientation": "landscape",
-        "icon": "./assets/images/start.png",
+        "icon": "./src/assets/images/logo.png",
         "updates": {
             "url": "https://u.expo.dev/34994044-990b-446d-9d35-8dfb80da31b4",
             "checkAutomatically": "ON_ERROR_RECOVERY"
@@ -17,28 +17,38 @@
         "android": {
             "package": "com.aifreetv.app",
             "adaptiveIcon": {
-                "foregroundImage": "./assets/images/start.jpg",
+                "foregroundImage": "./src/assets/images/start.png",
                 "backgroundColor": "#8B5CF6"
             },
             "splash": {
-                "image": "./assets/images/start.jpg"
+                "image": "./src/assets/images/start.png"
             }
         },
         "splash": {
-            "image": "./assets/start.jpg",
-            "resizeMode": "contain",
-            "backgroundColor": "#8B5CF6"
+            "image": "./src/assets/images/start.png",
+            "resizeMode": "cover",
+            "backgroundColor": "#8B5CF6",
+            "imageWidth": 1920
         },
         "plugins": [
-            "expo-splash-screen",
+            [
+                "expo-splash-screen",
+                [
+                    {
+                        "backgroundColor": "#8B5CF6",
+                        "image": "./src/assets/images/start.png",
+                        "imageWidth": 1920
+                    }
+                ]
+            ],
             "expo-status-bar",
             "expo-video",
             [
                 "@react-native-tvos/config-tv",
                 {
-                    "androidTVBanner": "./assets/images/start.jpg",
+                    "androidTVBanner": "./src/assets/images/start.png",
                     "appleTVImages": {
-                        "icon": "./assets/images/logo.png"
+                        "icon": "./src/assets/images/logo.png"
                     }
                 }
             ]

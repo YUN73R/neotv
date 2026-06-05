@@ -6,7 +6,9 @@ export interface TabConfig {
     url: string
 }
 
-export const IMAGE_URL = 'http://192.168.0.161:4396/tx.png'
+export const PLACEHOLDER_IMAGE = 'https://s41.ax1x.com/2026/06/05/pmZs8OO.md.png'
+export const PLACEHOLDER_IMAGE_TV = 'https://s41.ax1x.com/2026/06/05/pmZ2gWd.md.png'
+
 export const tabs: TabConfig[] = [
     { category: '最新', limit: 20, type: '全部', title: '推荐', url: 'movie' },
     { category: '热门', limit: 20, type: '全部', title: '电影', url: 'movie' },
@@ -140,5 +142,5 @@ export const API_CONFIG = {
         }
     }
 }
-export const M3U8_DATA_PATH = './src/assets/data/iptv.txt'
+export const M3U8_DATA_PATH = '../assets/data/iptv.m3u'
 export const M3U8_PATTERN = /\$https?:\/\/[^"'\s]+?\.m3u8/g

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Platform, View, Text, StyleSheet, ScrollView, Image, ToastAndroid } from 'react-native'
 import { MaterialIcons } from '@expo/vector-icons'
-import { useTheme } from '../context/ThemeContext'
+import { BOX_SHADOW, useTheme } from '../context/ThemeContext'
 import { storage } from '../utils/storage'
 import { FavoriteItem } from '../types/navigation'
 import FocusableView from '../layouts/FocusableView'
+import { PLACEHOLDER_IMAGE } from '../config/config'
+
 
 interface FavoritesPageProps {
     onBack: () => void
@@ -30,7 +32,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, onNavigate }) => 
                 if (Array.isArray(items)) {
                     const validItems = items.filter(item => item && item.id && item.title)
                     setFavorites(validItems)
-                    ToastAndroid.show('长按卡片可删除', ToastAndroid.LONG)
+                    ToastAndroid?.show?.('长按卡片可删除', ToastAndroid.LONG)
                 } else {
                     setFavorites([])
                 }
@@ -92,7 +94,6 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, onNavigate }) => 
                         <FocusableView
                             style={[styles.backButton, { backgroundColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)' }]}
                             onPress={onBack}
-                            hasTVPreferredFocus
                         >
                             <MaterialIcons name="arrow-back" size={24} color={theme.text} />
                         </FocusableView>
@@ -110,7 +111,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, onNavigate }) => 
                 )}
             </View>
 
-            <ScrollView style={[styles.content, { backgroundColor: theme.background }]}>
+            <ScrollView style={[styles.content, { backgroundColor: theme.background }]} showsVerticalScrollIndicator={false}>
                 {favorites.length === 0 ? (
                     <View style={styles.emptyState}>
                         <MaterialIcons name="favorite-border" size={60} color={theme.textSecondary} />
@@ -120,7 +121,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, onNavigate }) => 
                     </View>
                 ) : (
                     <View style={styles.favoritesGrid}>
-                        {favorites.map((item) => {
+                        {favorites.map((item, index) => {
                             if (!item || !item.id || !item.title) return null
                             const coverUrl = item.cover_url || ''
                             const title = item.title || ''
@@ -128,14 +129,19 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, onNavigate }) => 
                             return (
                                 <View key={item.id} style={[styles.cardWrapper, { flexBasis: isTV ? 100 : 140 }]}>
                                     <FocusableView
-                                        style={[styles.favoriteCard, { backgroundColor: theme.card, borderColor: theme.border }]}
+                                        style={[styles.favoriteCard, { backgroundColor: theme.card }]}
                                         onPress={() => handleItemPress(item)} onLongPress={() => removeItem(item.id)}
+                                        ferredFocus={index === 0}
                                     >
                                         <View style={styles.cardCoverWrapper}>
                                             <Image
-                                                source={{ uri: coverUrl }}
+                                                defaultSource={{
+                                                    uri: PLACEHOLDER_IMAGE,
+                                                }}
+                                                source={{ uri: coverUrl, headers: { 'Referrer': 'https://m.douban.com/', } }}
                                                 style={styles.cardCover}
                                                 resizeMode="cover"
+                                                crossOrigin="anonymous"
                                             />
                                             {!coverUrl && (
                                                 <View style={styles.coverPlaceholder}>
@@ -152,12 +158,15 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, onNavigate }) => 
                                             </Text>
                                         </View>
                                     </FocusableView>
-                                    <FocusableView
+                                    { !isTV && (
+                                        <FocusableView
                                         style={styles.deleteButton}
                                         onPress={() => removeItem(item.id)}
-                                    >
-                                        <MaterialIcons name="close" size={16} color="#fff" />
-                                    </FocusableView>
+                                        >
+                                            <MaterialIcons name="close" size={16} color="#fff" />
+                                        </FocusableView>
+                                    ) }
+                                    
                                 </View>
                             )
                         })}
@@ -195,6 +204,8 @@ const styles = StyleSheet.create({
     },
     clearButton: {
         paddingHorizontal: 16,
+        paddingVertical: 2,
+        borderRadius: 20,
     },
     clearButtonText: {
         fontSize: 14,
@@ -222,18 +233,15 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     cardWrapper: {
-        width: '18%',
+        flex: 1,
+        flexBasis: 140,
         position: 'relative',
     },
     favoriteCard: {
         borderRadius: 5,
-        borderWidth: 1,
+        borderWidth: 0,
         overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 3,
+        boxShadow: BOX_SHADOW,
     },
     cardCoverWrapper: {
         width: '100%',

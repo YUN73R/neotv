@@ -4,7 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { useTheme } from '../context/ThemeContext'
 import Toast from '../components/Toast'
 import ConfirmDialog from '../components/ConfirmDialog'
-import AboutDialog from '../components/AboutDialog'
+import AboutDialog from '../components/Dialog'
 import FocusableView from '../layouts/FocusableView'
 
 interface SettingsPageProps {
@@ -16,7 +16,6 @@ const isTV = Platform.isTV || Platform.OS === 'ios' || Platform.OS === 'android'
 
 const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
     const { theme, themeMode, toggleTheme } = useTheme()
-    const headerBg = themeMode === 'dark' ? '#2d2d2d' : '#e0e0e0'
 
     const [toastVisible, setToastVisible] = useState(false)
     const [toastMessage, setToastMessage] = useState('')
@@ -77,11 +76,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background }]}>
-            { isTV ? '' :  <View style={[styles.header, { backgroundColor: headerBg }]}>
+            { !isTV && <View style={[styles.header, { backgroundColor: theme.headerBg }]}>
                 <FocusableView
                     style={[styles.backButton, { backgroundColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)' }]}
                     onPress={onBack}
-                    hasTVPreferredFocus
                 >
                     <MaterialIcons name="arrow-back" size={24} color={theme.text} />
                 </FocusableView>

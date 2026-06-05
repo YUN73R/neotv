@@ -31,9 +31,10 @@ export interface FavoriteItem {
 export type RootStackParamList = {
   Home: undefined;
   Detail: { movie: MovieItem };
-  TVLive: undefined;
+  Live: undefined;
   Settings: undefined;
   History: undefined;
   Favorites: undefined;
   Search: undefined;
+  Recommend: undefined;
 };

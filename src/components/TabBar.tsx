@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, Text } from 'react-native';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme, SECONDARY_COLOR } from '../context/ThemeContext';
 import { tabs } from '../config/config';
 import FocusableView from '../layouts/FocusableView';
 
@@ -26,9 +26,10 @@ const TabBar: React.FC<TabBarProps> = ({ activeTab, onTabChange }) => {
               styles.tabButton,
               activeTab === tab.title && { backgroundColor: theme.accent },
             ]}
+            focusBorderColor={SECONDARY_COLOR}
             onPress={() => onTabChange(tab.title)}
             onFocus={() => onTabChange(tab.title)}
-            hasTVPreferredFocus={index === 0 && activeTab === tab.title}
+            ferredFocus={index === 0 && activeTab === tab.title}
           >
             <Text 
               style={[
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderColor: 'rgba(139, 92, 246, 0.5)',
   },
   tabText: {
     fontSize: 14,

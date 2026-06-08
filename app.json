@@ -8,7 +8,7 @@
         "orientation": "landscape",
         "updates": {
             "url": "https://u.expo.dev/34994044-990b-446d-9d35-8dfb80da31b4",
-            "checkAutomatically": "ON_ERROR_RECOVERY"
+            "checkAutomatically": "ON_LOAD"
         },
         "android": {
             "package": "com.aifreetv.app",
@@ -38,17 +38,6 @@
                     "backgroundColor": "#8B5CF6",
                     "image": "./src/assets/images/start.png",
                     "imageWidth": 400
-                }
-            ],
-            [
-                "react-native-video",
-                {
-                    "enableAndroidPictureInPicture": true,
-                    "enableBackgroundAudio": false,
-                    "androidExtensions": {
-                        "useExoplayerDash": true,
-                        "useExoplayerHls": true
-                    }
                 }
             ],
             "expo-status-bar",

@@ -13,7 +13,7 @@
         "android": {
             "package": "com.aifreetv.app",
             "adaptiveIcon": {
-                "foregroundImage": "./src/assets/images/icon.png",
+                "foregroundImage": "./src/assets/images/logo.png",
                 "backgroundColor": "#8B5CF6"
             },
             "usesCleartextTraffic": true,
@@ -28,7 +28,8 @@
         "splash": {
             "image": "./src/assets/images/start.png",
             "resizeMode": "cover",
-            "backgroundColor": "#8B5CF6"
+            "backgroundColor": "#8B5CF6",
+            "imageWidth": 400
         },
         "plugins": [
             [
@@ -36,7 +37,18 @@
                 {
                     "backgroundColor": "#8B5CF6",
                     "image": "./src/assets/images/start.png",
-                    "imageWidth": 200
+                    "imageWidth": 400
+                }
+            ],
+            [
+                "react-native-video",
+                {
+                    "enableAndroidPictureInPicture": true,
+                    "enableBackgroundAudio": false,
+                    "androidExtensions": {
+                        "useExoplayerDash": true,
+                        "useExoplayerHls": true
+                    }
                 }
             ],
             "expo-status-bar",

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { Platform, View, Text, StyleSheet, ScrollView, Modal, ActivityIndicator, BackHandler, Animated, useTVEventHandler, TVFocusGuideView } from 'react-native'
+import { Platform, View, Text, StyleSheet, ScrollView, Modal, ActivityIndicator, BackHandler, Animated, useTVEventHandler, TVFocusGuideView, TouchableOpacity } from 'react-native'
 import { MaterialIcons } from '@expo/vector-icons'
 import { getLiveStreamList } from '../services/liveService'
 import { Category, Channel } from '../utils/channel'
 import { storage } from '../utils/storage'
-import { useTheme, SECONDARY_COLOR } from '../context/ThemeContext'
+import { useTheme, SECONDARY_COLOR, PRIMARY_COLOR_TRANSPARENT } from '../context/ThemeContext'
 import FocusableView from '../layouts/FocusableView'
 import LivePlayer from '../components/LivePlayer'
 import Toast from '../components/Toast'
@@ -59,27 +59,27 @@ const LivePage: React.FC<LivePageProps> = ({ onBack }) => {
             setLoading(true)
             const data = await getLiveStreamList()
             setCategories(data)
-             if (data.length > 0 && data[0].channels.length > 0) {
+            if (data.length > 0 && data[0].channels.length > 0) {
                 setChannels(data[0].channels)
-             }
+            }
             const stored = await storage.getItem(STORAGE_KEY)
             setToastVisible(true)
             if (stored) {
                 const lastLive = JSON.parse(stored)
                 const category = data.find(category => category.id == lastLive.categoryId)
-                
+
                 if (category) {
                     setCurrentCategory(category)
                     setChannels(category.channels)
                     const channel = category.channels.find(channel => channel.id == lastLive.channelId)
                     if (channel) setCurrentChannel(channel)
-                        setToastMessage(channel?.name || '')   
+                    setToastMessage(channel?.name || '')
                 }
             } else {
                 setCurrentCategory(data[0])
                 setCurrentChannel(data[0].channels[0])
                 storage.setItem(STORAGE_KEY, JSON.stringify({ categoryId: data[0]?.id, channelId: data[0].channels[0].id }))
-                setToastMessage(data[0].channels[0]?.name || '')   
+                setToastMessage(data[0].channels[0]?.name || '')
             }
         } catch (error) {
             console.error('加载频道失败:', error)
@@ -137,9 +137,9 @@ const LivePage: React.FC<LivePageProps> = ({ onBack }) => {
                     <View style={styles.channelList}>
                         <ScrollView style={styles.category} showsVerticalScrollIndicator={false}>
                             {categories.map((category, index) => (
-                                <FocusableView key={index} 
-                                    style={[styles.categoryItem, { backgroundColor: category.id === currentCategory?.id ? theme.accent : 'transparent', }]} 
-                                    onPress={() => onChangeCategory(category)} 
+                                <FocusableView key={index}
+                                    style={[styles.categoryItem, { backgroundColor: category.id === currentCategory?.id ? theme.accent : 'transparent', }]}
+                                    onPress={() => onChangeCategory(category)}
                                     ferredFocus={showList && currentCategory?.id == category.id}
                                     focusBorderColor={SECONDARY_COLOR}
                                 >
@@ -149,8 +149,8 @@ const LivePage: React.FC<LivePageProps> = ({ onBack }) => {
                         </ScrollView>
                         <ScrollView style={styles.channel} showsVerticalScrollIndicator={false}>
                             {channels.map((channel, index) => (
-                                <FocusableView key={index} 
-                                    style={[styles.channelItem, { backgroundColor: currentChannel?.id === channel.id ? theme.accent : 'transparent', }]} 
+                                <FocusableView key={index}
+                                    style={[styles.channelItem, { backgroundColor: currentChannel?.id === channel.id ? theme.accent : 'transparent', }]}
                                     onPress={() => onChangeChannel(index)}
                                     focusBorderColor={SECONDARY_COLOR}
                                 >
@@ -162,6 +162,10 @@ const LivePage: React.FC<LivePageProps> = ({ onBack }) => {
                     <View style={styles.bar}>
                         <Text style={{ color: theme.textSecondary, fontSize: 12 }}>当前频道: {currentChannel?.name || '无'}</Text>
                         <Text style={{ color: theme.textSecondary, fontSize: 12 }}>按返回键关闭列表</Text>
+                        {!isTV && <TouchableOpacity style={[styles.closeListButton, { backgroundColor: theme.accent }]} onPress={() => setShowList(false)}>
+                            <Text style={{ color: theme.white, fontSize: 12 }}>关闭</Text>
+                        </TouchableOpacity>
+                        }
                     </View>
                 </Animated.View>
             }
@@ -204,8 +208,18 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         gap: 10,
+        borderTopColor: PRIMARY_COLOR_TRANSPARENT,
+        borderTopWidth: 1,
         paddingHorizontal: 10,
+    },
+    closeListButton: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     channelList: {
         width: '50%',

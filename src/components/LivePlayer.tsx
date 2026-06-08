@@ -4,7 +4,6 @@ import { StyleSheet, View, Text, Image, ActivityIndicator, TouchableOpacity } fr
 import { useEffect, useRef, useState } from 'react'
 import { useTheme, PRIMARY_COLOR_HEX, DANGER_COLOR } from '../context/ThemeContext'
 import { Feather } from '@expo/vector-icons'
-import FocusableView from '../layouts/FocusableView'
 
 export default function LivePlayer({ uri, onPress }: { uri: string, onPress: () => void }) {
     const playerRef = useRef<VideoView | null>(null)

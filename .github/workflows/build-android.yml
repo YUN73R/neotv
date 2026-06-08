@@ -33,7 +33,7 @@ jobs:
         run: npm ci
 
       - name: Prebuild for Android (TV)
-        run: npm run prebuild:tv
+        run: npm run prebuild
         env:
           EXPO_TV: 1
 

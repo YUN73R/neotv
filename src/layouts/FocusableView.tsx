@@ -10,6 +10,7 @@ interface FocusableViewProps {
     onFocus?: () => void
     onBlur?: () => void
     disabled?: boolean
+    focusBorderRadius?: number
     focusBorderColor?: string
     ferredFocus?: boolean
     backgroundColor?: string
@@ -25,6 +26,7 @@ const FocusableView: React.FC<FocusableViewProps> = ({
     onBlur,
     ferredFocus,
     disabled = false,
+    focusBorderRadius,
     focusBorderColor,
     backgroundColor,
 }) => {
@@ -53,7 +55,7 @@ const FocusableView: React.FC<FocusableViewProps> = ({
 
     const isTV = Platform.OS === 'android' || Platform.OS === 'ios'
     const borderColor = focusBorderColor || PRIMARY_COLOR_HEX
-    const borderRadius = Array.isArray(style) ? (style as any)?.[0]?.borderRadius : (style as any)?.borderRadius
+    const borderRadius = focusBorderRadius ?? Array.isArray(style) ? (style as any)?.[0]?.borderRadius : (style as any)?.borderRadius
 
     return (
         <Pressable

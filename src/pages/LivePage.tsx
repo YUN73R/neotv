@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { View, Text, StyleSheet, ScrollView, Modal, ActivityIndicator, BackHandler, Animated, useTVEventHandler, TVFocusGuideView } from 'react-native'
+import { Platform, View, Text, StyleSheet, ScrollView, Modal, ActivityIndicator, BackHandler, Animated, useTVEventHandler, TVFocusGuideView } from 'react-native'
 import { MaterialIcons } from '@expo/vector-icons'
 import { getLiveStreamList } from '../services/liveService'
 import { Category, Channel } from '../utils/channel'
@@ -16,6 +16,7 @@ const STORAGE_KEY = 'lastLive'
 const LivePage: React.FC<LivePageProps> = ({ onBack }) => {
     const { theme } = useTheme()
     const [loading, setLoading] = useState(false)
+    const isTV = Platform.isTV || Platform.OS == 'android' || Platform.OS == 'ios'
 
     const [toastVisible, setToastVisible] = useState(false)
     const [toastMessage, setToastMessage] = useState('')
@@ -62,22 +63,24 @@ const LivePage: React.FC<LivePageProps> = ({ onBack }) => {
                 setChannels(data[0].channels)
              }
             const stored = await storage.getItem(STORAGE_KEY)
+            setToastVisible(true)
             if (stored) {
                 const lastLive = JSON.parse(stored)
                 const category = data.find(category => category.id == lastLive.categoryId)
+                
                 if (category) {
                     setCurrentCategory(category)
                     setChannels(category.channels)
                     const channel = category.channels.find(channel => channel.id == lastLive.channelId)
                     if (channel) setCurrentChannel(channel)
+                        setToastMessage(channel?.name || '')   
                 }
             } else {
                 setCurrentCategory(data[0])
                 setCurrentChannel(data[0].channels[0])
                 storage.setItem(STORAGE_KEY, JSON.stringify({ categoryId: data[0]?.id, channelId: data[0].channels[0].id }))
+                setToastMessage(data[0].channels[0]?.name || '')   
             }
-            setToastVisible(true)
-            setToastMessage(currentChannel?.name || '')   
         } catch (error) {
             console.error('加载频道失败:', error)
         } finally {
@@ -115,7 +118,7 @@ const LivePage: React.FC<LivePageProps> = ({ onBack }) => {
             if (index > 0) onChangeChannel(index - 1)
         }
     }
-    useTVEventHandler(handleKeyDown)
+    if (isTV) useTVEventHandler(handleKeyDown)
 
     if (loading) {
         return (

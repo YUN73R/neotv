@@ -33,7 +33,7 @@ export default function VideoPlayer({ uri, poster, isFullScreen = false, toggleF
     const { theme, themeMode } = useTheme()
     
     return (
-        <FocusableView onPress={() => playerRef?.current?.enterFullscreen?.()} style={styles.contentContainer} ferredFocus={true}>
+        <FocusableView onPress={() => playerRef?.current?.enterFullscreen?.()} style={styles.contentContainer}>
             <VideoView
                 style={styles.video}
                 ref={playerRef}

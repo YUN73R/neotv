@@ -110,6 +110,10 @@ export const API_SITES: Record<string, SiteConfig> = {
         api: 'https://ikunzyapi.com',
         name: 'iKun'
     },
+    uuzy: {
+        api: 'https://uuzy.me',
+        name: 'UU资源'
+    }
 }
 
 // 添加聚合搜索的配置选项 

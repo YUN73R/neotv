@@ -1,64 +1,56 @@
 {
     "expo": {
+        "icon": "./src/assets/images/logo.png",
         "name": "极简TV",
         "description": "a free movie of tv app",
         "slug": "aifreetvapp",
         "version": "1.0.0",
         "orientation": "landscape",
-        "icon": "./src/assets/images/logo.png",
         "updates": {
             "url": "https://u.expo.dev/34994044-990b-446d-9d35-8dfb80da31b4",
             "checkAutomatically": "ON_ERROR_RECOVERY"
         },
-        "ios": {
-            "bundleIdentifier": "com.aifreetv.app",
-            "isRemoteUpdatesEnabled": true
-        },
         "android": {
             "package": "com.aifreetv.app",
             "adaptiveIcon": {
-                "foregroundImage": "./src/assets/images/start.png",
+                "foregroundImage": "./src/assets/images/icon.png",
                 "backgroundColor": "#8B5CF6"
             },
-            "splash": {
-                "image": "./src/assets/images/start.png"
-            }
+            "usesCleartextTraffic": true,
+            "runtimeVersion": "1.0.0",
+            "permissions": [
+                "INTERNET",
+                "ACCESS_NETWORK_STATE",
+                "WAKE_LOCK",
+                "ACCESS_WIFI_STATE"
+            ]
         },
         "splash": {
             "image": "./src/assets/images/start.png",
             "resizeMode": "cover",
-            "backgroundColor": "#8B5CF6",
-            "imageWidth": 1920
+            "backgroundColor": "#8B5CF6"
         },
         "plugins": [
             [
                 "expo-splash-screen",
-                [
-                    {
-                        "backgroundColor": "#8B5CF6",
-                        "image": "./src/assets/images/start.png",
-                        "imageWidth": 1920
-                    }
-                ]
+                {
+                    "backgroundColor": "#8B5CF6",
+                    "image": "./src/assets/images/start.png",
+                    "imageWidth": 200
+                }
             ],
             "expo-status-bar",
-            "expo-video",
-            [
-                "@react-native-tvos/config-tv",
-                {
-                    "androidTVBanner": "./src/assets/images/start.png",
-                    "appleTVImages": {
-                        "icon": "./src/assets/images/logo.png"
-                    }
-                }
-            ]
+            "expo-video"
         ],
         "extra": {
             "eas": {
                 "projectId": "34994044-990b-446d-9d35-8dfb80da31b4"
             }
         },
-        "jsEngine": "jsc",
-        "owner": "yun73r"
+        "ios": {
+            "runtimeVersion": {
+                "policy": "appVersion"
+            }
+        }
     }
 }

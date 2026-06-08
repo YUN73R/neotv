@@ -153,8 +153,8 @@ export const getMovieDetail = async (doubanId: string, word: string): Promise<Mo
                 }
 
                 // 如果没有找到播放地址，尝试使用正则表达式查找m3u8链接
-                if (episodes.length === 0 && result.data.vod_content) {
-                    const matches = result.data.vod_content.match(M3U8_PATTERN) || []
+                if (episodes.length === 0 && result.data.vod_play_url) {
+                    const matches = result.data.vod_play_url.match(M3U8_PATTERN) || []
                     episodes = matches.map((link: string) => link.replace(/^\$/, ''))
                 }
                 sources[originalIndex].data = episodes

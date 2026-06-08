@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Platform, View, Text, StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native'
 import { MaterialIcons, Feather } from '@expo/vector-icons'
-import { useTheme, PRIMARY_COLOR_HEX } from '../context/ThemeContext'
+import { useTheme, SECONDARY_COLOR } from '../context/ThemeContext'
 import Toast from '../components/Toast'
 import { storage } from '../utils/storage'
 import { doubanApi } from '../utils/api'
@@ -349,6 +349,7 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
                                             ? { backgroundColor: theme.accent }
                                             : {}
                                     ]}
+                                    focusBorderRadius={2}
                                     onPress={handleFavorite}
                                 >
                                     <Feather name="heart" size={16} color={isFavorite ? 'white' : theme.accent} />
@@ -378,6 +379,7 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
                                             styles.sourceTab,
                                             activeSourceIndex === index ? { backgroundColor: theme.accent } : { backgroundColor: theme.card, borderColor: theme.border },
                                         ]}
+                                        focusBorderColor={SECONDARY_COLOR}
                                         onPress={() => handleSourceChange(index)}
                                     >
                                         <Text style={[styles.sourceTabText, activeSourceIndex === index ? { color: 'white' } : { color: theme.text }]}>
@@ -399,6 +401,7 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
                                             styles.episodeButton,
                                             activeEpisodeIndex === index ? { backgroundColor: theme.accent } : { backgroundColor: theme.card, borderColor: theme.border },
                                         ]}
+                                        focusBorderColor={SECONDARY_COLOR}
                                         onPress={() => handleEpisodeSelect(index)}
                                     >
                                         <Text style={[styles.episodeButtonText, activeEpisodeIndex === index ? { color: 'white' } : { color: theme.text }]}>

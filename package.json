@@ -7,7 +7,7 @@
         "ios": "expo run:ios",
         "web": "expo start --web",
         "prebuild": "expo prebuild --clean",
-        "prebuild:tv": "EXPO_TV=1 expo prebuild --clean",
+        "prebuild:tv": "$env:EXPO_TV=\"1\"; expo prebuild --clean",
         "lint": "expo lint"
     },
     "dependencies": {

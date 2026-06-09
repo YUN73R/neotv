@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Platform, View, Text, StyleSheet, Switch, ActivityIndicator, ScrollView, Image } from 'react-native'
+import * as Updates from 'expo-updates'
 import { MaterialIcons } from '@expo/vector-icons'
 import { useTheme } from '../context/ThemeContext'
 import Toast from '../components/Toast'
@@ -23,6 +24,12 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
     const [aboutDialogVisible, setAboutDialogVisible] = useState(false)
     const [isChecking, setIsChecking] = useState(false)
 
+    const {
+        currentlyRunning,
+        isUpdateAvailable,
+        isUpdatePending
+    } = Updates.useUpdates()
+
     const showToast = (message: string) => {
         setToastMessage(message)
         setToastVisible(true)
@@ -36,10 +43,9 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
 
         setIsChecking(true)
         try {
-            const Updates = require('expo-updates')
-            const update = await Updates.checkForUpdateAsync()
+            await Updates.checkForUpdateAsync()
 
-            if (update.isAvailable) {
+            if (isUpdateAvailable) {
                 setConfirmDialogVisible(true)
             } else {
                 showToast('当前已是最新版本')
@@ -61,13 +67,13 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
         showToast('正在下载更新...')
 
         try {
-            const Updates = require('expo-updates')
             await Updates.fetchUpdateAsync()
-            showToast('更新下载成功，即将重启应用')
-
-            setTimeout(() => {
-                Updates.reloadAsync()
-            }, 2000)
+            if(isUpdatePending) {
+                showToast('更新下载成功，即将重启应用')
+                setTimeout(() => {
+                    Updates.reloadAsync()
+                }, 1500)
+            }
         } catch (error) {
             console.error('更新失败:', error)
             showToast('更新下载失败，请稍后重试')
@@ -76,7 +82,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background }]}>
-            { !isTV && <View style={[styles.header, { backgroundColor: theme.headerBg }]}>
+            {!isTV && <View style={[styles.header, { backgroundColor: theme.headerBg }]}>
                 <FocusableView
                     style={[styles.backButton, { backgroundColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)' }]}
                     onPress={onBack}
@@ -131,7 +137,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
                         </View>
                         <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
                             {/**@ts-ignore */}
-                            <Text style={{ color: theme.text, fontWeight: 'bold', width: 50, textAlignLast: 'justify' }}>声明</Text> 
+                            <Text style={{ color: theme.text, fontWeight: 'bold', width: 50, textAlignLast: 'justify' }}>声明</Text>
                             <Text style={{ color: theme.textSecondary, flex: 1, lineHeight: 24, }}>
                                 该应用内容均来自网络，为非商业用途，仅用于学习和研究，开发者不对使用者任何自身行为承担任何责任。
                             </Text>

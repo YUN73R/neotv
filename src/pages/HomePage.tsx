@@ -4,6 +4,7 @@ import { MaterialIcons, Feather, MaterialCommunityIcons } from '@expo/vector-ico
 import { useTheme, PRIMARY_COLOR_HEX, BOX_SHADOW, SECONDARY_COLOR } from '../context/ThemeContext'
 import Banner from '../components/Banner'
 import TabBar from '../components/TabBar'
+import SplashScreen from '../components/SplashScreen'
 import { doubanApi } from '../utils/api'
 import { tabs } from '../config/config'
 import FocusableView from '../layouts/FocusableView'
@@ -225,7 +226,10 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     }
 
     return (
+        <>
+        { isTV && <SplashScreen />}
         <View style={[styles.container, { backgroundColor: theme.background }]}>
+            
             <View style={[styles.header, { backgroundColor: headerBg }]}>
                 <View style={styles.headerLeft}>
                     <Image source={require('../assets/images/logo.png')} style={styles.logo} />
@@ -335,6 +339,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 </View>
             </ScrollView>
         </View>
+        </>
     )
 }
 

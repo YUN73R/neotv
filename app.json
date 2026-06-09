@@ -1,19 +1,24 @@
 {
     "expo": {
-        "icon": "./src/assets/images/logo.png",
+        "icon": "./src/assets/images/logo-contain.png",
         "name": "极简TV",
         "description": "a free movie of tv app",
         "slug": "aifreetvapp",
+        "owner": "yun73r",
         "version": "1.0.0",
         "orientation": "landscape",
+        "githubUrl": "https://github.com/YUN73R/neotv",
+        "backgroundColor": "#8B5CF6",
         "updates": {
             "url": "https://u.expo.dev/34994044-990b-446d-9d35-8dfb80da31b4",
-            "checkAutomatically": "ON_LOAD"
+            "checkAutomatically": "ON_LOAD",
+            "fallbackToCacheTimeout": 60000
         },
         "android": {
             "package": "com.aifreetv.app",
             "adaptiveIcon": {
-                "foregroundImage": "./src/assets/images/logo.png",
+                "foregroundImage": "./src/assets/images/logo-contain.png",
+                "backgroundImage": "./src/assets/images/start.png",
                 "backgroundColor": "#8B5CF6"
             },
             "usesCleartextTraffic": true,
@@ -25,21 +30,7 @@
                 "ACCESS_WIFI_STATE"
             ]
         },
-        "splash": {
-            "image": "./src/assets/images/start.png",
-            "resizeMode": "cover",
-            "backgroundColor": "#8B5CF6",
-            "imageWidth": 400
-        },
         "plugins": [
-            [
-                "expo-splash-screen",
-                {
-                    "backgroundColor": "#8B5CF6",
-                    "image": "./src/assets/images/start.png",
-                    "imageWidth": 400
-                }
-            ],
             "expo-status-bar",
             "expo-video",
             "@react-native-tvos/config-tv"

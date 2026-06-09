@@ -5,7 +5,7 @@
 <h1 style="width: 100%;text-align: center;">NeoTV 极简TV</h1>
 
 本项目使用react native tvos + expo 构建，技术栈如下：
-> react native tvos + expo + typescript + tailwindcss
+> react native + expo + typescript
 
 ### 安装依赖
 ```bash

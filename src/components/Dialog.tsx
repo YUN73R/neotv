@@ -65,7 +65,6 @@ const AboutDialog: React.FC<AboutDialogProps> = ({ visible, title, content, onCl
             <FocusableView
               style={[styles.confirmButton, { backgroundColor: theme.accent }]}
               onPress={onClose}
-              hasTVPreferredFocus
             >
               <Text style={styles.confirmButtonText}>确定</Text>
             </FocusableView>

@@ -30,6 +30,7 @@
                 "ndk": "25.1.8937393"
             },
             "env": {
+                "EXPO_TV": "1",
                 "EXPO_USE_BARE_WORKFLOW": "1"
             },
             "developmentClient": false

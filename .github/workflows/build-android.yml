@@ -1,54 +1,108 @@
-name: Build Android APK
+name: Android TV Release
 
 on:
+  workflow_dispatch:
+
   push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:  # 允许手动触发
+    tags:
+      - "v*"
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
-    timeout-minutes: 90
-    
+
+    permissions:
+      contents: write
+
     steps:
-      - name: Checkout code
+
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
+          node-version: 22
+          cache: npm
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Install npm dependencies
+      - name: Install Dependencies
         run: npm ci
 
-      - name: Prebuild for Android (TV)
-        run: npm run prebuild:tv
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Restore Keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > android-keystore.jks
+
+      - name: Generate TV Native Project
         env:
           EXPO_TV: 1
+        run: |
+          npx expo prebuild --clean --platform android
 
-      - name: Build Android APK
+      - name: Configure Signing
+        run: |
+
+          cat >> android/gradle.properties <<EOF
+          MYAPP_UPLOAD_STORE_FILE=../../android-keystore.jks
+          MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}
+          MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_STORE_PASSWORD }}
+          MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}
+          EOF
+
+      - name: Patch app/build.gradle
+        run: |
+
+          sed -i '/android {/a\
+          signingConfigs {\
+              release {\
+                  storeFile file(MYAPP_UPLOAD_STORE_FILE)\
+                  storePassword MYAPP_UPLOAD_STORE_PASSWORD\
+                  keyAlias MYAPP_UPLOAD_KEY_ALIAS\
+                  keyPassword MYAPP_UPLOAD_KEY_PASSWORD\
+              }\
+          }\
+          buildTypes {\
+              release {\
+                  signingConfig signingConfigs.release\
+              }\
+          }' \
+          android/app/build.gradle
+
+      - name: Build APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon --stacktrace
-        env:
-          GRADLE_OPTS: "-Xmx4096m -XX:MaxMetaspaceSize=1024m"
-          JAVA_OPTS: "-Xmx4096m -XX:MaxMetaspaceSize=1024m"
+          ./gradlew assembleRelease
+
+      - name: Build AAB
+        run: |
+          cd android
+          ./gradlew bundleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
-          path: android/app/build/outputs/apk/release/
-          retention-days: 30
+          name: android-tv-apk
+          path: |
+            android/app/build/outputs/apk/release/*.apk
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-tv-aab
+          path: |
+            android/app/build/outputs/bundle/release/*.aab
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            android/app/build/outputs/apk/release/*.apk
+            android/app/build/outputs/bundle/release/*.aab

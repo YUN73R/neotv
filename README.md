@@ -1,12 +1,15 @@
 # NeoTV - 极简TV，看见美好时光
-
 <div align="center">
+    <br />
+    <br />
   <img src="./src/assets/images/logo.png" alt="NeoTV Logo" width="120">
   <br>
   <p><strong>极简视界 精彩无限</strong></p>
+  <br>
 </div>
 
-##### 一个android tv app，免费在线视频搜索与观看平台，可以免费观看最新影视剧，IPTV电视直播
+#
+#### 一个android tv app，免费在线视频搜索与观看平台，可以免费观看最新影视剧，IPTV电视直播
 
 ## 项目简介
 本项目使用的技术栈如下：

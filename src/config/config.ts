@@ -65,10 +65,10 @@ export const API_SITES: Record<string, SiteConfig> = {
         api: 'https://wolongzyw.com',
         name: '卧龙',
     },
-    hwba: {
-        api: 'https://cjhwba.com',
-        name: '华为吧',
-    },
+    // hwba: {
+    //     api: 'https://cjhwba.com',
+    //     name: '华为吧',
+    // },
     jisu: {
         api: 'https://jszyapi.com',
         name: '极速',
@@ -110,10 +110,10 @@ export const API_SITES: Record<string, SiteConfig> = {
         api: 'https://ikunzyapi.com',
         name: 'iKun'
     },
-    uuzy: {
-        api: 'https://uuzy.me',
-        name: 'UU资源'
-    }
+    // uuzy: {
+    //     api: 'https://uuzy.me',
+    //     name: 'UU资源'
+    // }
 }
 
 // 添加聚合搜索的配置选项 

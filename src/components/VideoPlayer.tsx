@@ -26,8 +26,6 @@ export default function VideoPlayer({ uri, poster, isFullScreen = false, toggleF
         if (isFullScreen) playerRef?.current?.enterFullscreen?.()
     }, [isFullScreen])
 
-    const sourceLoaded = useEvent(player, 'sourceLoad')
-    
     const { status } = useEvent(player, 'statusChange', { status: player.status })
 
     const { theme, themeMode } = useTheme()
@@ -50,7 +48,7 @@ export default function VideoPlayer({ uri, poster, isFullScreen = false, toggleF
                 }}
             />
             <View style={styles.loadingWrapper}>
-                {!sourceLoaded && (
+                {(status != 'readyToPlay') && (
                     <Image style={styles.poster} 
                     defaultSource={{
                         uri: PLACEHOLDER_IMAGE_TV,
@@ -92,14 +90,16 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         borderRadius: 8,
+        zIndex: 6,
     },
     loadingWrapper: {
-        zIndex: 10,
+        zIndex: 1,
         position: 'absolute',
         inset: 0,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     poster: {
         width: '100%',

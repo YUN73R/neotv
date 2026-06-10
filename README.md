@@ -29,14 +29,19 @@
 ```bash
 npm install
 ```
-#### 运行项目
-```bash
-npm start
-```
+
 #### 构建项目
 ```bash
 npm run prebuild
 ```
+
+#### 运行项目
+```bash
+npm start
+```
+
+## 🎉打包
+
 #### eas build 打包
 ```bash
 npx eas build --platform android
@@ -62,7 +67,7 @@ org.gradle.java.home=C:/Program Files/Eclipse Adoptium/jdk-17.0.19.10-hotspot
 
 ##
 
-## 关于http视频播放限制🚀
+## 🚀关于http视频播放限制
 > Android 9（API 28+）默认 block cleartext traffic，禁止 HTTP。如果需要播放http视频，需要添加 networkSecurityConfig 配置。
 > 但是一般不生效，需要插件自动添加android http明文传输权限。配置如下：
 ```bash
@@ -113,7 +118,7 @@ cd android
 ```
 等待打包完成，安装之后可以看到http视频可以播放🎉
 
-## 关于包体积
+## 🎈关于包体积
 
 > 如果觉得打出来的包太大，则可以分平台打包，例如：`armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64`等，如果只在电视或手机使用（因为专门为TV适配，不推荐手机使用），可以配置为`arm64-v8a`，目前安卓主流架构为`arm64-v8a`，如果在模拟器上测试，可以不用配置（不考虑包大小）或者配置为`x86/x86_64`，以`arm64-v8a`为例，配置如下：
 ```json

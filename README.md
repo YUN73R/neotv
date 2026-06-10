@@ -64,7 +64,7 @@ org.gradle.java.home=C:/Program Files/Eclipse Adoptium/jdk-17.0.19.10-hotspot
 
 ## 关于http视频播放限制🚀
 > Android 9（API 28+）默认 block cleartext traffic，禁止 HTTP。如果需要播放http视频，需要添加 networkSecurityConfig 配置。
-> 但是一般不生效，需要插件自动添加android http明文传输配置。配置如下：
+> 但是一般不生效，需要插件自动添加android http明文传输权限。配置如下：
 ```bash
 # 首先安装expo-build-properties插件
 npx expo install expo-build-properties

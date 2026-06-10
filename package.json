@@ -8,6 +8,7 @@
     "web": "expo start --web",
     "prebuild": "expo prebuild --clean",
     "prebuild:tv": "$env:EXPO_TV=\"1\"; expo prebuild --clean",
+    "build:r": "cd android && .\\gradlew assembleRelease",
     "lint": "expo lint"
   },
   "dependencies": {

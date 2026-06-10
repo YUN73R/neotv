@@ -39,10 +39,11 @@ const searchMovieByDoubanId = async (
     word: string
 ): Promise<{ found: boolean; movie?: any; error?: string }> => {
     const baseURL = getBaseURL()
-    const searchUrl = `${baseURL}${site.api}${API_CONFIG.search.path}${encodeURIComponent(word)}`
+    const searchUrl = `${baseURL}${baseURL ? encodeURIComponent(site.api + API_CONFIG.search.path + word) : `${site.api}${API_CONFIG.search.path}${encodeURIComponent(word)}`}`
     try {
         const response = await httpClient.get(searchUrl)
         const data = response.data
+
         if (!data || !data.list || !Array.isArray(data.list) || data.list.length === 0) {
             return { found: false, error: '无搜索结果' }
         }
@@ -56,7 +57,6 @@ const searchMovieByDoubanId = async (
 
         return { found: false, error: '未找到匹配的电影' }
     } catch (error) {
-        console.log(`[${siteKey}] 搜索失败:`, error)
         return { found: false, error: (error as Error).message }
     }
 }
@@ -119,50 +119,48 @@ export const getMovieDetail = async (doubanId: string, word: string): Promise<Mo
             }
         }
 
-        const foundSources = sources.filter(s => s.movie)
+        const foundSources = sources.filter(s => s.movie && s.success)
         console.log(`搜索完成，找到 ${foundSources.length} 个可用源`)
 
-        const detailPromises = foundSources.map(async (source) => {
-            const originalIndex = sources.findIndex(s => s.name === source.name)
-            const result = await fetchMovieDetail(httpClient, source.name, API_SITES[source.name], source.movie.vod_id)
-            return ({ originalIndex, result })
-        })
 
-        const detailResults = await Promise.all(detailPromises)
+        for(let i in foundSources) {
+            const result = foundSources[i].movie
+            let episodes = []
+            if (result.vod_play_url) {
+                // 分割不同播放源
+                const playSources = result.vod_play_url.split('$$$')
 
-        for (const { originalIndex, result } of detailResults) {
-            if (result.success && result.data) {
-                let episodes = []
-                if (result.data.vod_play_url) {
-                    // 分割不同播放源
-                    const playSources = result.data.vod_play_url.split('$$$')
-
-                    // 提取第一个播放源的集数（通常为主要源）
-                    if (playSources.length > 0) {
-                        const mainSource = playSources[0]
-                        const episodeList = mainSource.split('#')
-
-                        // 从每个集数中提取名称和URL
-                        episodes = episodeList.map((ep:any, index: number) => {
+                // 提取第一个播放源的集数（通常为主要源）
+                if (playSources.length > 0) {
+                    const items: any[] = []
+                    for(let source of playSources) {
+                        const episodeList = source.split('#')
+                        episodeList.forEach((ep: any, index: number) => {
                             const parts = ep.split('$')
                             const name = parts.length > 0 ? parts[0].replace(/^\s+|\s+$/g, '') : `第${index + 1}集`
                             const url = parts.length > 1 ? parts[1].replace(/^\s+|\s+$/g, '') : ''
-                            return { name, url }
-                        }).filter((item: any) => item.url && (item.url.startsWith('http://') || item.url.startsWith('https://')))
+                            items.push({ name, url })
+                        })
+                        
+                        
+                        // episodes = episodeList.map((ep: any, index: number) => {
+                        //     const parts = ep.split('$')
+                        //     const name = parts.length > 0 ? parts[0].replace(/^\s+|\s+$/g, '') : `第${index + 1}集`
+                        //     const url = parts.length > 1 ? parts[1].replace(/^\s+|\s+$/g, '') : ''
+                        //     return { name, url }
+                        // }).filter((item: any) => item.url && ((item.url.startsWith('http://') && item.url.indexOf('m3u8') === -1) || (item.url.startsWith('https://') && item.url.indexOf('m3u8') === -1)))
                     }
+                    episodes = items.filter((item: any) => item.url && ((item.url.startsWith('http://') && item.url.endsWith('m3u8')) || (item.url.startsWith('https://') && item.url.endsWith('m3u8'))))
                 }
-
-                // 如果没有找到播放地址，尝试使用正则表达式查找m3u8链接
-                if (episodes.length === 0 && result.data.vod_play_url) {
-                    const matches = result.data.vod_play_url.match(M3U8_PATTERN) || []
-                    episodes = matches.map((link: string) => link.replace(/^\$/, ''))
-                }
-                sources[originalIndex].data = episodes
-                sources[originalIndex].success = true
-            } else {
-                sources[originalIndex].error = result.error
-                sources[originalIndex].success = false
             }
+
+            // 如果没有找到播放地址，尝试使用正则表达式查找m3u8链接
+            // if (episodes.length === 0 && result.vod_play_url) {
+            //     const matches = result.vod_play_url.match(M3U8_PATTERN) || []
+            //     episodes = matches.map((link: string) => link.replace(/^\$/, ''))
+            // }
+            sources[i].data = episodes
+            sources[i].success = true
         }
 
         const successCount = sources.filter(s => s.success).length
@@ -176,7 +174,7 @@ export const getMovieDetail = async (doubanId: string, word: string): Promise<Mo
         }
 
     } catch (error) {
-        console.error('movieService 执行失败:', error)
+        console.log('movieService 执行失败:', error)
         return {
             sources,
             found: false,

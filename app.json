@@ -33,7 +33,16 @@
         "plugins": [
             "expo-status-bar",
             "expo-video",
-            "@react-native-tvos/config-tv"
+            "@react-native-tvos/config-tv",
+            "./plugins/withAndroidAllCleartext",
+            [
+                "expo-build-properties",
+                {
+                    "android": {
+                        "usesCleartextTraffic": true
+                    }
+                }
+            ]
         ],
         "extra": {
             "eas": {

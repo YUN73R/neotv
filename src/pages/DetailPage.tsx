@@ -101,6 +101,7 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
                 if (validSources.length > 0) {
                     setActiveSourceIndex(0)
                     parseEpisodes(validSources[0])
+                    validSources[0].movie?.vod_pic && (detailData.coverUrl = validSources[0].movie?.vod_pic)
                 }
             }
             setLoadingSources(false)
@@ -190,6 +191,7 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
         setActiveSourceIndex(index)
         if (sources[index]) {
             parseEpisodes(sources[index])
+            sources[index].movie?.vod_pic && (detailData.coverUrl = sources[index].movie?.vod_pic)
         }
     }
 

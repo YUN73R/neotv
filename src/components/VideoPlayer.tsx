@@ -53,12 +53,8 @@ export default function VideoPlayer({ uri, poster, isFullScreen = false, toggleF
                     defaultSource={{
                         uri: PLACEHOLDER_IMAGE_TV,
                     }}
-                    source={{
-                        uri: poster,
-                        headers: {
-                            Referer: 'https://m.douban.com/',
-                        }
-                    }} crossOrigin="anonymous" />
+                    source={{ uri: poster?.replace(/img\d+/, 'img1'), headers: { 'Referrer': 'https://m.douban.com/', } }}
+                    crossOrigin="anonymous" />
                 )}
                 {status == 'loading' && (
                     <View style={styles.loadingContainer}>

@@ -190,7 +190,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                         defaultSource={{
                             uri: PLACEHOLDER_IMAGE,
                         }}
-                        source={{ uri: safeCover, headers: { 'Referrer': 'https://m.douban.com/', } }}
+                        source={{ uri: safeCover?.replace(/img\d+/, 'img1'), headers: { 'Referrer': 'https://m.douban.com/', }, cache: 'reload' }}
                         style={styles.contentCover}
                         resizeMode="cover"
                         crossOrigin="anonymous"

@@ -101,7 +101,6 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
                 if (validSources.length > 0) {
                     setActiveSourceIndex(0)
                     parseEpisodes(validSources[0])
-                    validSources[0].movie?.vod_pic && (detailData.coverUrl = validSources[0].movie?.vod_pic)
                 }
             }
             setLoadingSources(false)
@@ -191,7 +190,6 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
         setActiveSourceIndex(index)
         if (sources[index]) {
             parseEpisodes(sources[index])
-            sources[index].movie?.vod_pic && (detailData.coverUrl = sources[index].movie?.vod_pic)
         }
     }
 
@@ -294,7 +292,7 @@ const DetailPage: React.FC<DetailPageProps> = ({ onBack, movie }) => {
                                             defaultSource={{
                                                 uri: PLACEHOLDER_IMAGE_TV,
                                             }}
-                                            source={{ uri: detailData.coverUrl, headers: { 'Referrer': 'https://m.douban.com/', } }}
+                                            source={{ uri: detailData.coverUrl?.replace(/img\d+/, 'img1'), headers: { 'Referrer': 'https://m.douban.com/', } }}
                                             style={{ width: '100%', height: '100%' }}
                                             resizeMode="cover"
                                             crossOrigin="anonymous"

@@ -147,7 +147,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onBack, onNavigate }) => {
                                                 defaultSource={{
                                                     uri: PLACEHOLDER_IMAGE,
                                                 }}
-                                                source={{ uri: coverUrl, headers: { 'Referrer': 'https://m.douban.com/', } }}
+                                                source={{ uri: coverUrl?.replace(/img\d+/, 'img1'), headers: { 'Referrer': 'https://m.douban.com/', } }}
                                                 style={styles.cardCover}
                                                 resizeMode="cover"
                                                 crossOrigin="anonymous"

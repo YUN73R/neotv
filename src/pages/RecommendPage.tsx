@@ -352,12 +352,7 @@ const RecommendPage: React.FC<RecommendPageProps> = ({ onBack, onNavigate }) => 
                                                         defaultSource={{
                                                             uri: PLACEHOLDER_IMAGE,
                                                         }}
-                                                        source={{ 
-                                                            uri: cover,
-                                                            headers: {
-                                                                referrer: 'https://m.douban.com/',
-                                                            }
-                                                         }}
+                                                        source={{ uri: cover?.replace(/img\d+/, 'img1'), headers: { 'Referrer': 'https://m.douban.com/', } }}
                                                         crossOrigin="anonymous"
                                                         style={styles.recommendImage}
                                                         resizeMode="cover"

@@ -107,7 +107,7 @@ const Banner: React.FC<BannerProps> = ({ onItemPress }) => {
                                 defaultSource={{
                                     uri: PLACEHOLDER_IMAGE_TV,
                                 }}
-                                source={{ uri: safeCover, headers: { 'Referrer': 'https://m.douban.com/', } }}
+                                source={{ uri: safeCover?.replace(/img\d+/, 'img1'), headers: { 'Referrer': 'https://m.douban.com/', } }}
                                 style={styles.bannerImage}
                                 resizeMode="cover"
                                 crossOrigin="anonymous"
